@@ -10,4 +10,4 @@ reflectionModel/FresnelLaser/FresnelLaser.C
 reflectionModel/Fresnel/Fresnel.C
 
 
-LIB = $(FOAM_LIBBIN)/liblaserDTRM
+LIB = $(FOAM_USER_LIBBIN)/liblaserDTRM
