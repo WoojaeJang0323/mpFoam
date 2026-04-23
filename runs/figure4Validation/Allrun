@@ -5,6 +5,8 @@ cd ${0%/*} || exit 1
 runApplication blockMesh
 runApplication snappyHexMesh -overwrite
 runApplication checkMesh
-runApplication $(getApplication)
+runApplication decomposePar
+runParallel $(getApplication)
+runApplication reconstructPar
 
 #------------------------------------------------------------------------------
