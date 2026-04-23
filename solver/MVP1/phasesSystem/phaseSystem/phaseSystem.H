@@ -506,8 +506,15 @@ public:
         virtual tmp<fvScalarMatrix> preRect
         (
             const volScalarField& C,
-	        const dimensionedScalar& molW,
-	        volScalarField& SuOutput
+		        const dimensionedScalar& molW,
+		        volScalarField& SuOutput
+        ) = 0;
+
+        //- Update and return interfacial mass transfer rate
+        virtual tmp<volScalarField> updateDmdt
+        (
+            const volScalarField& referenceField,
+            volScalarField& SuOutput
         ) = 0;
 
 

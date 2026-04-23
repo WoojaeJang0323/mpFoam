@@ -51,6 +51,7 @@ License
 #include "kineticGasEvaporation.H"
 #include "Lee.H"
 #include "precipitate.H"
+#include "mixingPrecipitation.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -408,6 +409,112 @@ namespace Foam
             solidThermo,
             pureMixture,
             hPolyTranspPolyIcoSolidThermoPhysics,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            icoPoly8HThermoPhysics
+        );
+
+    // mixingPrecipitation model definitions
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            BoussinesqFluidEThermoPhysics,
+            heSolidThermo,
+            solidThermo,
+            pureMixture,
+            hConstSolidThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            constRhoHThermoPhysics,
+            heSolidThermo,
+            solidThermo,
+            pureMixture,
+            hConstSolidThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            constRhoHThermoPhysics,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            constRhoHThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            constRhoHThermoPhysics,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            BoussinesqFluidEThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heSolidThermo,
+            solidThermo,
+            pureMixture,
+            hConstSolidThermoPhysics,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            BoussinesqFluidEThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heSolidThermo,
+            solidThermo,
+            pureMixture,
+            hConstSolidThermoPhysics,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            constRhoHThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heSolidThermo,
+            solidThermo,
+            pureMixture,
+            hPolyTranspPolyIcoSolidThermoPhysics,
+            heRhoThermo,
+            rhoThermo,
+            pureMixture,
+            icoPoly8HThermoPhysics
+        );
+
+        makeInterfacePureType
+        (
+            mixingPrecipitation,
+            heSolidThermo,
+            solidThermo,
+            pureMixture,
+            hPowerSolidThermoPhysics,
             heRhoThermo,
             rhoThermo,
             pureMixture,

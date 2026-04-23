@@ -616,7 +616,19 @@ void Foam::multiphaseSystem::solve()
                 << dmdtTot_.value()
                 << endl;
 
-            dimensionedScalar massErrRel = (dmdtTot_*deltaT_-(solidMass_-solidMassOld_))/(solidMass_-solidMassOld_)*100;
+            const dimensionedScalar solidMassDelta(solidMass_ - solidMassOld_);
+            dimensionedScalar massErrRel
+            (
+                "massErrRel",
+                dimless,
+                0.0
+            );
+
+            if (mag(solidMassDelta).value() > VSMALL)
+            {
+                massErrRel =
+                    (dmdtTot_*deltaT_ - solidMassDelta)/solidMassDelta*100;
+            }
 
             if(Pstream::master() && mesh.time().outputTime())
             {

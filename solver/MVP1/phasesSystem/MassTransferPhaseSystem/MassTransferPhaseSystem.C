@@ -174,21 +174,31 @@ Foam::MassTransferPhaseSystem<BasePhaseSystem>::dmdt
 }
 
 template<class BasePhaseSystem>
-Foam::tmp<Foam::fvScalarMatrix>
-Foam::MassTransferPhaseSystem<BasePhaseSystem>::preRect
+Foam::tmp<Foam::volScalarField>
+Foam::MassTransferPhaseSystem<BasePhaseSystem>::updateDmdt
 (
-    const volScalarField& C,
-    const dimensionedScalar& molW,
+    const volScalarField& referenceField,
     volScalarField& SuOutput
 )
 {
-    tmp<fvScalarMatrix> cEqnPtr
+    tmp<volScalarField> tdmdtTotal
     (
-        new fvScalarMatrix(C, dimMoles/dimTime)
+        new volScalarField
+        (
+            IOobject
+            (
+                "dmdtTotal",
+                this->mesh().time().timeName(),
+                this->mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            this->mesh(),
+            dimensionedScalar(dimDensity/dimTime, Zero)
+        )
     );
-
-    fvScalarMatrix& eqn = cEqnPtr.ref();
-
+    volScalarField& dmdtTotal = tdmdtTotal.ref();
+    SuOutput = dimensionedScalar(dimDensity/dimTime, Zero);
 
     forAllConstIters(this->phaseModels_, iteri)
     {
@@ -235,7 +245,11 @@ Foam::MassTransferPhaseSystem<BasePhaseSystem>::preRect
 
                     // Explicit mass transfer rate
                     tmp<volScalarField> Kexp =
-                        interfacePtr->Kexp(interfaceCompositionModel::T, C);
+                        interfacePtr->Kexp
+                        (
+                            interfaceCompositionModel::T,
+                            referenceField
+                        );
 
                     if (Kexp.valid())
                     {
@@ -255,7 +269,11 @@ Foam::MassTransferPhaseSystem<BasePhaseSystem>::preRect
 
                     // Explicit temperature mass transfer rate
                     const tmp<volScalarField> Kexp =
-                        interfacePtr->Kexp(interfaceCompositionModel::T, C);
+                        interfacePtr->Kexp
+                        (
+                            interfaceCompositionModel::T,
+                            referenceField
+                        );
 
                     if (Kexp.valid())
                     {
@@ -269,14 +287,35 @@ Foam::MassTransferPhaseSystem<BasePhaseSystem>::preRect
                 word keyikName(phasei.name() + phasek.name());
                 word keykiName(phasek.name() + phasei.name());
 
-		        SuOutput = dmdtNetki;
-                eqn -=
-                    (
-                        dmdtNetki/molW
-                    );
+			        SuOutput = dmdtNetki;
+                    dmdtTotal += dmdtNetki;
             }
         }
     }
+
+    return tdmdtTotal;
+}
+
+
+template<class BasePhaseSystem>
+Foam::tmp<Foam::fvScalarMatrix>
+Foam::MassTransferPhaseSystem<BasePhaseSystem>::preRect
+(
+    const volScalarField& C,
+    const dimensionedScalar& molW,
+    volScalarField& SuOutput
+)
+{
+    tmp<fvScalarMatrix> cEqnPtr
+    (
+        new fvScalarMatrix(C, dimMoles/dimTime)
+    );
+
+    fvScalarMatrix& eqn = cEqnPtr.ref();
+    const tmp<volScalarField> tdmdtNet = updateDmdt(C, SuOutput);
+
+    eqn -= tdmdtNet()/molW;
+
     return cEqnPtr;
 
 }

@@ -1,0 +1,102 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+castellatedMesh true;
+snap            true;
+addLayers       false;
+
+geometry
+{
+    sphere
+    {
+        type searchableSphere;
+        centre (0.0007 0 0);
+        radius 0.0001;
+    }
+}
+
+castellatedMeshControls
+{
+    maxLocalCells       200000;
+    maxGlobalCells      2000000;
+    minRefinementCells  10;
+    maxLoadUnbalance    0.10;
+    nCellsBetweenLevels 2;
+
+    features
+    (
+    );
+
+    refinementSurfaces
+    {
+        sphere
+        {
+            level (2 2);
+
+            patchInfo
+            {
+                type wall;
+            }
+        }
+    }
+
+    resolveFeatureAngle 30;
+
+    refinementRegions
+    {
+        sphere
+        {
+            mode distance;
+            levels
+            (
+                (0.0002 2)
+                (0.00035 1)
+            );
+        }
+    }
+
+    locationInMesh (0.00005 0 0);
+    allowFreeStandingZoneFaces false;
+}
+
+snapControls
+{
+    nSmoothPatch    3;
+    tolerance       2.0;
+    nSolveIter      30;
+    nRelaxIter      5;
+
+    nFeatureSnapIter        10;
+    implicitFeatureSnap     false;
+    explicitFeatureSnap     false;
+    multiRegionFeatureSnap  false;
+}
+
+addLayersControls
+{
+}
+
+meshQualityControls
+{
+    #include "meshQualityDict"
+
+    nSmoothScale    4;
+    errorReduction  0.75;
+}
+
+mergeTolerance 1e-6;
+
+// ************************************************************************* //

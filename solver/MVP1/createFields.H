@@ -11,21 +11,62 @@
     )
 );
 
-    // Molar weight of precipitated species
-    dimensionedScalar molW
-    (
-	    "molW",
-	    dimMass/dimMoles,
-	    inputParameters
-    );
+	    // Molar weight of precipitated species
+	    dimensionedScalar molW
+	    (
+		    "molW",
+		    dimMass/dimMoles,
+		    inputParameters
+	    );
 
-    // Diffusion coefficient of acid in fluid phase
-    dimensionedScalar diffInLiquid
-    (
-    	"diffInLiquid",
-	    dimLength*dimLength/dimTime,
-	    inputParameters
-    );
+        const Switch useTwoSpecies
+        (
+            inputParameters.lookupOrDefault<Switch>("useTwoSpecies", false)
+        );
+
+	    // Diffusion coefficient of acid in fluid phase
+	    dimensionedScalar diffInLiquid
+	    (
+	    	"diffInLiquid",
+		    dimLength*dimLength/dimTime,
+		    inputParameters
+	    );
+
+        dimensionedScalar diffCationInLiquid
+        (
+            "diffCationInLiquid",
+            dimLength*dimLength/dimTime,
+            inputParameters.lookupOrDefault<scalar>
+            (
+                "diffCationInLiquid",
+                diffInLiquid.value()
+            )
+        );
+
+        dimensionedScalar diffAnionInLiquid
+        (
+            "diffAnionInLiquid",
+            dimLength*dimLength/dimTime,
+            inputParameters.lookupOrDefault<scalar>
+            (
+                "diffAnionInLiquid",
+                diffInLiquid.value()
+            )
+        );
+
+        dimensionedScalar nuCation
+        (
+            "nuCation",
+            dimless,
+            inputParameters.lookupOrDefault<scalar>("nuCation", 1.0)
+        );
+
+        dimensionedScalar nuAnion
+        (
+            "nuAnion",
+            dimless,
+            inputParameters.lookupOrDefault<scalar>("nuAnion", 1.0)
+        );
 
     Info<< "The molar weight of solid is set as: \n" << molW << endl;
 
@@ -73,46 +114,144 @@
         mesh
     );
 
-    Info<< "Reading field C\n" << endl;
-    volScalarField C 
-    (
-        IOobject
-        (
-            "C",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+	    Info<< "Reading field C\n" << endl;
+	    volScalarField C 
+	    (
+	        IOobject
+	        (
+	            "C",
+	            runTime.timeName(),
+	            mesh,
+	            IOobject::READ_IF_PRESENT,
+	            IOobject::AUTO_WRITE
+	        ),
+	        mesh,
+            dimensionedScalar("CDefault", dimMoles/dimVolume, Zero)
+	    );
 
-    volScalarField SuOut 
-    (
-        IOobject
+        Info<< "Reading field Ccation\n" << endl;
+        volScalarField Ccation
+        (
+            IOobject
+            (
+                "Ccation",
+                runTime.timeName(),
+                mesh,
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            mesh,
+            dimensionedScalar("CcationDefault", dimMoles/dimVolume, Zero)
+        );
+
+        Info<< "Reading field Canion\n" << endl;
+        volScalarField Canion
+        (
+            IOobject
+            (
+                "Canion",
+                runTime.timeName(),
+                mesh,
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            mesh,
+            dimensionedScalar("CanionDefault", dimMoles/dimVolume, Zero)
+        );
+	
+	    volScalarField SuOut 
+	    (
+	        IOobject
         (
             "SuOut",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+	        ),
+	        mesh
+	    );
 
-    Info<< "Reading field diffusion coefficient for C field\n" << endl;
-    volScalarField diffCo
+        volScalarField SuCationOut
+        (
+            IOobject
+            (
+                "SuCationOut",
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh,
+            dimensionedScalar("SuCationOutDefault", dimMoles/dimVolume/dimTime, Zero)
+        );
+
+        volScalarField SuAnionOut
+        (
+            IOobject
+            (
+                "SuAnionOut",
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh,
+            dimensionedScalar("SuAnionOutDefault", dimMoles/dimVolume/dimTime, Zero)
+        );
+
+	    Info<< "Reading field diffusion coefficient for C field\n" << endl;
+	    volScalarField diffCo
     (
         IOobject
+	        (
+	            "diffCo",
+	            runTime.timeName(),
+	            mesh,
+	            IOobject::READ_IF_PRESENT,
+	            IOobject::AUTO_WRITE
+	        ),
+	        mesh,
+            dimensionedScalar("diffCoDefault", dimLength*dimLength/dimTime, Zero)
+	    );
+
+        volScalarField diffCoCation
         (
-            "diffCo",
-            runTime.timeName(),
+            IOobject
+            (
+                "diffCoCation",
+                runTime.timeName(),
+                mesh,
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
+            dimensionedScalar
+            (
+                "diffCoCationDefault",
+                dimLength*dimLength/dimTime,
+                Zero
+            )
+        );
+
+        volScalarField diffCoAnion
+        (
+            IOobject
+            (
+                "diffCoAnion",
+                runTime.timeName(),
+                mesh,
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            mesh,
+            dimensionedScalar
+            (
+                "diffCoAnionDefault",
+                dimLength*dimLength/dimTime,
+                Zero
+            )
+        );
 
     volScalarField areaDensityGrad 
     (

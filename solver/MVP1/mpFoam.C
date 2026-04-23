@@ -137,7 +137,14 @@ int main(int argc, char *argv[])
             #include "UEqn.H"
             //#include "YEqns.H"
             //#include "TEqn.H"
-	        #include "CEqn.H"
+            if (useTwoSpecies)
+            {
+	            #include "SpeciesEqns.H"
+            }
+            else
+            {
+	            #include "CEqn.H"
+            }
             fluid.correct();
             // --- Pressure corrector loop
             while (pimple.correct())

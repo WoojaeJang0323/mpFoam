@@ -129,6 +129,13 @@ public:
 	//- Return the species source matrix and fill dmdt for phase
 	virtual tmp<fvScalarMatrix> preRect(const volScalarField& C, const dimensionedScalar& molW, volScalarField& SuOutput);
 
+        //- Update the interfacial mass transfer rate and fill dmdt for phases
+        virtual tmp<volScalarField> updateDmdt
+        (
+            const volScalarField& referenceField,
+            volScalarField& SuOutput
+        );
+
 
         //- Calculate mass transfer for species
         virtual void massSpeciesTransfer

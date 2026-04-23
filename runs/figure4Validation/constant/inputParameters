@@ -1,0 +1,28 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      inputParameters;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+useTwoSpecies       yes;
+
+molW                233.39;
+
+diffInLiquid        1.4e-9;
+diffCationInLiquid  1.4e-9;
+diffAnionInLiquid   1.4e-9;
+
+nuCation            1.0;
+nuAnion             1.0;
+
+// ************************************************************************* //
