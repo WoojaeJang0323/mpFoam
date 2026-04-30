@@ -1,0 +1,56 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Default: whole domain is liquid (no solid).
+defaultFieldValues
+(
+    volScalarFieldValue alpha.liquid 1
+    volScalarFieldValue alpha.solid  0
+);
+
+// Cells inside (or cut by) pillars_scaled.stl are flagged as solid.
+// outsidePoints must lie in the fluid region.
+regions
+(
+    surfaceToCell
+    {
+        file                  "constant/triSurface/pillars_scaled2.stl";
+        // outsidePoints is unused when useSurfaceOrientation=true,
+        // but the dict still requires the key.
+        outsidePoints         ((8.75e-4 4.756e-4 1.15e-5));
+        // Mark only cells whose center lies inside the STL.
+        // includeCut=true would also flag every cell the surface crosses,
+        // overestimating pillar volume on a coarse base mesh.
+        includeCut            false;
+        includeInside         true;
+        includeOutside        false;
+        nearDistance          -1;
+        curvature             -1;
+        // Use the (closed) surface's own inside-test instead of flood-fill
+        // from outsidePoints, which gets blocked between narrowly-spaced pillars.
+        useSurfaceOrientation true;
+
+        fieldValues
+        (
+            volScalarFieldValue alpha.liquid 0
+            volScalarFieldValue alpha.solid  1
+            volScalarFieldValue Ccation      0
+            volScalarFieldValue Canion       0
+        );
+    }
+);
+
+// ************************************************************************* //

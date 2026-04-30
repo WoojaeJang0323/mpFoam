@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type    massTransferMultiphaseSystem;
+
+phases  (liquid solid);
+
+liquid
+{
+    type            pureMovingPhaseModel;
+}
+
+solid
+{
+    type            pureStaticSolidPhaseModel;
+}
+
+interfacePorous
+(
+    (solid and liquid)
+    {
+        type            VollerPrakash;
+        solidPhase      alpha.solid;
+        Cu              1e20;
+    }
+);
+
+massTransferModel
+(
+    (liquid to solid)
+    {
+        type                mixingPrecipitation;
+        kPrec               1.479e-9;
+        Tactivate           298.15;
+        nPrec               1.0;
+        Ksp                 1.1025e-4;
+        Mv                  233.39;
+        cationField         Ccation;
+        anionField          Canion;
+        // Use gradient-based area density at the liquid/solid interface
+        smoothSurface       false;
+        smoothAreaDensity   1e5;
+        reactiveWallPatches ();
+        writeSaturationFields true;
+    }
+);
+
+// ************************************************************************* //

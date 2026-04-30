@@ -1,0 +1,17 @@
+#!/bin/sh
+cd ${0%/*} || exit 1
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Restore clean uniform fields from 0.orig/
+cp -f 0.orig/* 0/
+
+runApplication blockMesh
+runApplication setFields
+runApplication decomposePar
+runParallel $(getApplication)
+runApplication reconstructPar
+
+# Recreate empty .foam file for ParaView
+touch mixingPrecipitation.foam
+
+#------------------------------------------------------------------------------
