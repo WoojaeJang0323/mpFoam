@@ -3,10 +3,11 @@ cd ${0%/*} || exit 1
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 runApplication blockMesh
-runApplication setFields
 
-# Override setFields phase initialization with the saved alpha fields.
+# Restore clean alpha fields from 0.orig before setFields marks the pillars.
 cp -f 0.orig/alpha.solid 0.orig/alpha.liquid 0/
+
+runApplication setFields
 
 runApplication decomposePar
 runParallel $(getApplication)
